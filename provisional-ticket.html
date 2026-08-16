@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Received | Safar Bengal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --mmt-blue: #0b4a8e;
+            --mmt-red: #eb2026;
+            --mmt-green: #26b5a9;
+            --warning-orange: #f39c12;
+            --bg-gray: #e5eef5;
+            --white: #ffffff;
+            --text-dark: #4a4a4a;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Lato', sans-serif; }
+        body { background-color: var(--bg-gray); color: var(--text-dark); }
+        a { text-decoration: none; color: inherit; }
+
+        /* HEADER */
+        header {
+            background-color: var(--white); padding: 15px 5%; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 24px; font-weight: 900; color: var(--mmt-blue); }
+        .logo span { color: var(--mmt-red); }
+
+        /* TICKET CONTAINER */
+        .ticket-wrapper {
+            max-width: 650px; margin: 50px auto; padding: 0 5%;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .ticket-box {
+            background: var(--white); border-radius: 16px; padding: 40px;
+            text-align: center; box-shadow: var(--shadow);
+            border-top: 8px solid var(--warning-orange); position: relative;
+            overflow: hidden;
+        }
+
+        /* WATERMARK */
+        .watermark {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px; font-weight: 900; color: rgba(243, 156, 18, 0.05);
+            white-space: nowrap; pointer-events: none; z-index: 0;
+        }
+
+        /* STATUS HEADER */
+        .status-icon { font-size: 50px; color: var(--warning-orange); margin-bottom: 15px; }
+        .ticket-box h1 { font-size: 28px; font-weight: 900; color: #000; margin-bottom: 5px; position: relative; z-index: 1; }
+        .ticket-box p.subtitle { font-size: 16px; font-weight: 700; color: #666; margin-bottom: 25px; position: relative; z-index: 1; }
+
+        /* LOADER */
+        .loader-container { display: flex; align-items: center; justify-content: center; gap: 15px; background: #fffcf5; border: 1px solid #fdebd0; padding: 15px; border-radius: 8px; margin-bottom: 30px; position: relative; z-index: 1; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--warning-orange); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        .loader-container p { font-size: 14px; font-weight: 900; color: var(--warning-orange); }
+
+        /* TICKET DETAILS GRID */
+        .details-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+            background: #f8f9fa; padding: 25px; border-radius: 12px;
+            border: 1px dashed #ccc; text-align: left; position: relative; z-index: 1;
+        }
+        .detail-item label { font-size: 12px; color: #888; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .detail-item p { font-size: 16px; font-weight: 900; color: #333; }
+        .detail-item.full { grid-column: span 2; }
+        .detail-item.highlight p { color: var(--mmt-blue); font-size: 18px; }
+
+        /* ACTION BUTTONS */
+        .action-area { margin-top: 30px; position: relative; z-index: 1; }
+        .btn-whatsapp {
+            background: #25D366; color: white; border: none; width: 100%;
+            padding: 18px; font-size: 16px; font-weight: 900; border-radius: 8px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); transition: 0.3s;
+        }
+        .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
+        .info-text { font-size: 13px; color: #888; font-weight: 700; margin-top: 15px; }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 768px) { .details-grid { grid-template-columns: 1fr; } .detail-item.full { grid-column: span 1; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><a href="index.html">Safar<span>Bengal</span></a></div>
+    </header>
+
+    <div class="ticket-wrapper">
+        <div class="ticket-box">
+            <div class="watermark">PENDING</div>
+            
+            <i class="fas fa-check-circle status-icon"></i>
+            <h1>Booking Request Received</h1>
+            <p class="subtitle">Your seat is temporarily blocked.</p>
+
+            <div class="loader-container">
+                <div class="spinner"></div>
+                <p>Verifying UTR / Payment... (Usually takes 5-10 mins)</p>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-item full">
+                    <label>Passenger Name</label>
+                    <p id="dispName">Loading...</p>
+                </div>
+                <div class="detail-item full">
+                    <label>Journey Route</label>
+                    <p id="dispRoute">Loading...</p>
+                </div>
+                <div class="detail-item highlight">
+                    <label>Operator</label>
+                    <p id="dispOperator">Loading...</p>
+                </div>
+                <div class="detail-item highlight">
+                    <label>Selected Seats</label>
+                    <p id="dispSeats">Loading...</p>
+                </div>
+                <div class="detail-item">
+                    <label>Total Amount Paid</label>
+                    <p style="color: var(--mmt-red);">₹<span id="dispAmount">0</span></p>
+                </div>
+                <div class="detail-item">
+                    <label>UTR / Reference No.</label>
+                    <p id="dispUTR">Loading...</p>
+                </div>
+            </div>
+
+            <div class="action-area">
+                <button class="btn-whatsapp" onclick="sendToAdmin()">
+                    <i class="fab fa-whatsapp" style="font-size: 24px;"></i> Step 3: Send to Admin for Instant Approval
+                </button>
+                <p class="info-text">Click the button above to send your UTR details to our WhatsApp support team. We will verify the payment and send you the confirmed PDF ticket immediately.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Get URL Parameters from checkout.html
+        const urlParams = new URLSearchParams(window.location.search);
+        const operator = urlParams.get('operator') || 'N/A';
+        const route = urlParams.get('route') || 'N/A';
+        const seats = urlParams.get('seats') || 'N/A';
+        const amount = urlParams.get('amount') || '0';
+        const name = urlParams.get('name') || 'Passenger';
+        const phone = urlParams.get('phone') || 'N/A';
+        const utr = urlParams.get('utr') || 'N/A';
+
+        // 2. Populate Ticket UI
+        document.getElementById('dispName').innerText = `${name} (+91 ${phone})`;
+        document.getElementById('dispRoute').innerText = route;
+        document.getElementById('dispOperator').innerText = operator;
+        document.getElementById('dispSeats').innerText = seats;
+        document.getElementById('dispAmount').innerText = amount;
+        document.getElementById('dispUTR').innerText = utr;
+
+        // 3. Automated WhatsApp Dispatch Logic
+        function sendToAdmin() {
+            const ADMIN_WHATSAPP = "919679481018";
+            
+            // Format a professional message for the admin to read easily
+            const message = `*🚨 URGENT: NEW TICKET VERIFICATION* \n\n`
+                          + `*Passenger:* ${name}\n`
+                          + `*Phone:* ${phone}\n`
+                          + `*Route:* ${route}\n`
+                          + `*Operator:* ${operator}\n`
+                          + `*Seats Blocked:* ${seats}\n`
+                          + `*Amount Paid:* ₹${amount}\n`
+                          + `*UTR/Ref No:* ${utr}\n\n`
+                          + `_Please verify this payment in your bank app and send me the confirmed ticket._`;
+
+            const whatsappUrl = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(message)}`;
+            
+            // Open WhatsApp in a new tab
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
