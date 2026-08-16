@@ -3,275 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safar Bengal | Admin Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Safar Bengal | Premium Travel Ecosystem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --primary: #eb2026;
-            --sidebar-bg: #0b4a8e;
-            --bg-color: #f4f7f6;
-            --text-dark: #333;
+            --brand-blue: #0A2239;
+            --brand-red: #D32F2F;
+            --brand-green: #2ecc71;
+            --bg-light: #F4F7F6;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
         }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Nunito', sans-serif; background-color: var(--bg-light); color: #333; }
+
+        /* HEADER */
+        header {
+            background: var(--white); padding: 15px 5%; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;
         }
-        .sidebar {
-            width: 260px;
-            background-color: var(--sidebar-bg);
-            color: white;
-            height: 100vh;
-            position: fixed;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        .logo { font-size: 26px; font-weight: 900; color: var(--brand-blue); cursor: pointer; }
+        .logo span { color: var(--brand-red); }
+
+        /* VIEWS */
+        .view-section { display: none; padding: 40px 5%; animation: fadeIn 0.5s; max-width: 1000px; margin: 0 auto; }
+        .view-section.active { display: block; }
+
+        /* BUS CARD */
+        .bus-card {
+            background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);
         }
-        .brand {
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+        .btn-pay {
+            background: var(--brand-green); color: white; border: none; padding: 12px 30px;
+            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;
+            transition: 0.3s; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
         }
-        .brand h2 { margin: 0; color: #fff; font-weight: 600; }
-        .brand span { font-size: 12px; color: #ccc; text-transform: uppercase; }
-        .nav-buttons { display: flex; flex-direction: column; padding-top: 20px; }
-        .tab-btn {
-            background: transparent; border: none; color: #ccc;
-            padding: 18px 25px; text-align: left; font-size: 15px;
-            font-family: 'Poppins', sans-serif; cursor: pointer;
-            transition: all 0.3s ease; border-left: 4px solid transparent;
+        .btn-pay:hover { transform: translateY(-2px); }
+
+        /* PAYMENT MODAL */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;
         }
-        .tab-btn:hover { background-color: rgba(255,255,255,0.05); color: white; }
-        .tab-btn.active {
-            background-color: rgba(0,0,0,0.2); color: white;
-            border-left: 4px solid var(--primary); font-weight: 600;
+        .payment-box {
+            background: white; width: 100%; max-width: 450px; border-radius: 16px;
+            padding: 30px; text-align: center; position: relative;
         }
-        .main-content {
-            margin-left: 260px; padding: 40px;
-            width: calc(100% - 260px); box-sizing: border-box;
+        .close-modal {
+            position: absolute; top: 15px; right: 20px; background: none; border: none;
+            font-size: 24px; cursor: pointer; color: #888;
         }
-        .header h1 { margin: 0 0 30px 0; color: var(--text-dark); font-size: 28px; }
-        .form-section {
-            background: white; padding: 35px; border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05); display: none;
-            max-width: 800px;
+        .qr-placeholder {
+            width: 200px; height: 200px; margin: 20px auto; border: 2px dashed #ccc;
+            display: flex; justify-content: center; align-items: center; border-radius: 8px;
         }
-        .form-section.active { display: block; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group.full-width { grid-column: span 2; }
-        label { font-size: 14px; color: #555; margin-bottom: 8px; font-weight: 600; }
-        input, select {
-            padding: 12px 15px; border: 1px solid #ddd;
-            border-radius: 6px; font-size: 15px; font-family: 'Poppins', sans-serif;
-            outline: none; transition: border 0.3s;
+        .mobile-pay-btn {
+            display: none; background: #673AB7; color: white; padding: 15px; width: 100%;
+            border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 18px; margin: 20px 0;
         }
-        input:focus, select:focus { border-color: var(--sidebar-bg); }
-        button.submit-btn {
-            background-color: var(--primary); color: white; border: none;
-            padding: 15px; font-size: 16px; font-weight: 600; border-radius: 6px;
-            cursor: pointer; margin-top: 20px; grid-column: span 2; transition: 0.3s;
+        @media (max-width: 768px) {
+            .qr-placeholder { display: none; }
+            .mobile-pay-btn { display: block; }
         }
-        button.submit-btn:hover { background-color: #c0392b; }
-        #toast {
-            visibility: hidden; min-width: 250px; background-color: #333;
-            color: #fff; text-align: center; border-radius: 8px; padding: 16px;
-            position: fixed; z-index: 1000; left: 50%; bottom: 30px;
-            transform: translateX(-50%); font-size: 15px;
+        .utr-input-group { margin-top: 25px; text-align: left; }
+        .utr-input-group label { font-weight: bold; color: #555; display: block; margin-bottom: 8px; }
+        .utr-input {
+            width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px;
+            font-size: 16px; outline: none; font-weight: bold; text-transform: uppercase;
         }
-        #toast.show { visibility: visible; }
+        .utr-input:focus { border-color: var(--brand-blue); }
+        .btn-verify {
+            background: var(--brand-blue); color: white; border: none; width: 100%; padding: 15px;
+            font-size: 16px; font-weight: bold; border-radius: 8px; margin-top: 15px; cursor: pointer;
+        }
+
+        /* PROVISIONAL TICKET */
+        .ticket-box {
+            background: white; border-radius: 16px; padding: 40px; text-align: center;
+            box-shadow: var(--shadow); border-top: 8px solid #f1c40f;
+        }
+        .ticket-status { color: #f39c12; font-weight: 900; font-size: 24px; margin-bottom: 10px; }
+        .ticket-loader { border: 4px solid #f3f3f3; border-top: 4px solid #f39c12; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        .ticket-details { background: #f9f9f9; padding: 20px; border-radius: 8px; text-align: left; margin: 25px 0; }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="brand">
-            <h2>Safar Bengal</h2>
-            <span>Admin Control Panel</span>
-        </div>
-        <div class="nav-buttons">
-            <button class="tab-btn active" onclick="switchTab('busSection', this, 'Add New Bus Route')">🚌 Manage Buses</button>
-            <button class="tab-btn" onclick="switchTab('packageSection', this, 'Add Holiday Package')">🏖️ Manage Packages</button>
-            <button class="tab-btn" onclick="switchTab('hotelSection', this, 'Add Hotel Listing')">🏨 Manage Hotels</button>
-            <button class="tab-btn" onclick="switchTab('cabSection', this, 'Add New Cab Route')">🚖 Manage Cabs</button>
-        </div>
-    </div>
+    <header>
+        <div class="logo">Safar<span>Bengal</span></div>
+    </header>
 
-    <div class="main-content">
-        <div class="header">
-            <h1 id="pageTitle">Add New Bus Route</h1>
+    <!-- 1. CUSTOMER VIEW -->
+    <main id="customer-view" class="view-section active">
+        <h2 style="margin-bottom: 20px;">Available Journeys</h2>
+        
+        <div class="bus-card">
+            <div>
+                <h2 id="busName">Greenline Premium Volvo</h2>
+                <p style="color: #666; font-size: 16px;">Siliguri ➔ Kolkata | Departure: 06:00 PM</p>
+                <div style="color: #f39c12; margin-top: 5px;"><i class="fas fa-star"></i> 4.8 (120 Reviews)</div>
+            </div>
+            <div style="text-align: right;">
+                <h2 style="color: var(--brand-red); font-size: 28px;">₹1,200</h2>
+                <button class="btn-pay" onclick="openPaymentModal(1200, 'Greenline Premium Volvo - SLG to CCU')">
+                    <i class="fas fa-lock"></i> Pay & Book Now
+                </button>
+            </div>
         </div>
+    </main>
 
-        <!-- BUS FORM -->
-        <div id="busSection" class="form-section active">
-            <form id="formBus">
-                <div class="form-grid">
-                    <div class="form-group full-width"><label>Operator Name</label><input type="text" id="bOp" required></div>
-                    <div class="form-group"><label>Source</label><input type="text" id="bSrc" required></div>
-                    <div class="form-group"><label>Destination</label><input type="text" id="bDst" required></div>
-                    <div class="form-group"><label>Time</label><input type="time" id="bTime" required></div>
-                    <div class="form-group"><label>Price (₹)</label><input type="number" id="bPrice" required></div>
-                    <button type="submit" class="submit-btn">Save Bus</button>
-                </div>
-            </form>
-        </div>
+    <!-- 2. PAYMENT MODAL -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="payment-box">
+            <button class="close-modal" onclick="closePaymentModal()"><i class="fas fa-times"></i></button>
+            <h2 style="color: var(--brand-blue);">Secure Payment</h2>
+            <p style="color: #666; margin-top: 5px;">Amount to Pay: <strong style="color: var(--brand-red); font-size: 20px;" id="payAmountTxt">₹0</strong></p>
+            
+            <!-- Desktop QR Code -->
+            <div class="qr-placeholder" id="qrContainer">
+                <img id="qrCodeImg" src="" alt="UPI QR Code" style="width: 100%; border-radius: 8px;">
+            </div>
+            <p style="font-size: 12px; color: #888;" class="desktop-only">Scan with GPay, PhonePe, or Paytm</p>
 
-        <!-- PACKAGE FORM -->
-        <div id="packageSection" class="form-section">
-            <form id="formPackage">
-                <div class="form-grid">
-                    <div class="form-group full-width"><label>Package Title</label><input type="text" id="pTitle" required></div>
-                    <div class="form-group"><label>Location</label><input type="text" id="pLoc" required></div>
-                    <div class="form-group"><label>Duration</label><input type="text" id="pDur" required></div>
-                    <div class="form-group"><label>Price (₹)</label><input type="number" id="pPrice" required></div>
-                    <div class="form-group full-width"><label>Image URL</label><input type="url" id="pImg" required></div>
-                    <button type="submit" class="submit-btn">Save Package</button>
-                </div>
-            </form>
-        </div>
+            <!-- Mobile Magic Link -->
+            <a href="#" id="mobilePayBtn" class="mobile-pay-btn"><i class="fas fa-mobile-alt"></i> Tap to Pay via UPI App</a>
 
-        <!-- HOTEL FORM -->
-        <div id="hotelSection" class="form-section">
-            <form id="formHotel">
-                <div class="form-grid">
-                    <div class="form-group full-width"><label>Hotel Name</label><input type="text" id="hName" required></div>
-                    <div class="form-group"><label>Location</label><input type="text" id="hLoc" required></div>
-                    <div class="form-group"><label>Category</label>
-                        <select id="hCat">
-                            <option>Budget</option><option>3 Star</option><option>4 Star</option><option>Resort</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Price Per Night (₹)</label><input type="number" id="hPrice" required></div>
-                    <button type="submit" class="submit-btn">Save Hotel</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- CAB FORM -->
-        <div id="cabSection" class="form-section">
-            <form id="formCab">
-                <div class="form-grid">
-                    <div class="form-group full-width"><label>Route</label><input type="text" id="cRoute" required></div>
-                    <div class="form-group"><label>Vehicle Type</label>
-                        <select id="cType"><option>Hatchback</option><option>Sedan</option><option>SUV</option></select>
-                    </div>
-                    <div class="form-group"><label>Category</label>
-                        <select id="cShare"><option>Private</option><option>Shared</option></select>
-                    </div>
-                    <div class="form-group full-width"><label>Price (₹)</label><input type="number" id="cPrice" required></div>
-                    <button type="submit" class="submit-btn">Save Cab</button>
-                </div>
-            </form>
+            <!-- UTR Verification -->
+            <div class="utr-input-group">
+                <label>Step 2: Enter 12-digit UTR / Reference No.</label>
+                <input type="text" id="utrNumber" class="utr-input" placeholder="e.g. 321456789012" maxlength="12">
+                <button class="btn-verify" onclick="submitUTR()"><i class="fas fa-check-circle"></i> Confirm Booking</button>
+            </div>
         </div>
     </div>
 
-    <div id="toast">Message</div>
+    <!-- 3. PROVISIONAL TICKET VIEW -->
+    <main id="ticket-view" class="view-section">
+        <div class="ticket-box">
+            <i class="fas fa-clock" style="font-size: 40px; color: #f39c12;"></i>
+            <h2 class="ticket-status">Booking Received</h2>
+            <p style="font-size: 18px; color: #555;">Payment Under Verification</p>
+            
+            <div class="ticket-loader"></div>
+            <p style="color: #888; font-size: 14px;">Usually takes 10-15 minutes to verify payment.</p>
 
-    <!-- UI Logic -->
+            <div class="ticket-details">
+                <p><strong>Journey:</strong> <span id="ticketJourney"></span></p>
+                <p><strong>Amount Paid:</strong> ₹<span id="ticketAmount"></span></p>
+                <p><strong>UTR Reference:</strong> <span id="ticketUTR"></span></p>
+                <p><strong>Status:</strong> <span style="color: #f39c12; font-weight: bold;">Pending Approval</span></p>
+            </div>
+
+            <button onclick="contactSupport()" style="background: #25D366; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">
+                <i class="fab fa-whatsapp"></i> Chat with Support
+            </button>
+        </div>
+    </main>
+
     <script>
-        function switchTab(sectionId, btnElement, title) {
-            document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
-            btnElement.classList.add('active');
-            document.getElementById('pageTitle').innerText = title;
+        // CORE BUSINESS SETTINGS
+        const UPI_ID = "7679975939-1@okbizaxis";
+        const BUSINESS_NAME = "Safar Bengal";
+        const WHATSAPP_NUM = "919679481018";
+        
+        let currentBookingAmount = 0;
+        let currentBookingDetails = "";
+
+        // OPEN PAYMENT MODAL
+        function openPaymentModal(amount, details) {
+            currentBookingAmount = amount;
+            currentBookingDetails = details;
+            
+            document.getElementById('payAmountTxt').innerText = `₹${amount}`;
+            
+            // Generate Dynamic UPI Link
+            const upiLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(BUSINESS_NAME)}&am=${amount}&cu=INR&tn=Ticket Booking`;
+            
+            // Generate QR Code for Desktop using free API
+            document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+            
+            // Set Link for Mobile Button
+            document.getElementById('mobilePayBtn').href = upiLink;
+            
+            document.getElementById('paymentModal').style.display = 'flex';
         }
 
-        function showNotification(msg, isError = false) {
-            const toast = document.getElementById("toast");
-            toast.innerText = msg;
-            toast.style.backgroundColor = isError ? "#e74c3c" : "#2ecc71";
-            toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
         }
-    </script>
 
-    <!-- Firebase Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        // SUBMIT UTR AND GENERATE TICKET
+        function submitUTR() {
+            const utr = document.getElementById('utrNumber').value.trim();
+            if(utr.length < 12) {
+                alert("Please enter a valid 12-digit UTR/Reference Number.");
+                return;
+            }
 
-        // Your Firebase Configuration from the image
-        const firebaseConfig = {
-            apiKey: "AIzaSyDhBIBmNRRIJDPLBXqmWErVa1OAlEN_VAM", 
-            authDomain: "mentlify-8cbbf.firebaseapp.com",
-            projectId: "mentlify-8cbbf",
-            storageBucket: "mentlify-8cbbf.firebasestorage.app",
-            messagingSenderId: "565118088482",
-            appId: "1:565118088482:web:628ad1e279e91fcc6aa17b",
-            measurementId: "G-5W93R6ELBN"
-        };
+            // Close Modal & Switch to Ticket View
+            closePaymentModal();
+            document.getElementById('customer-view').classList.remove('active');
+            document.getElementById('ticket-view').classList.add('active');
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+            // Populate Ticket Data
+            document.getElementById('ticketJourney').innerText = currentBookingDetails;
+            document.getElementById('ticketAmount').innerText = currentBookingAmount;
+            document.getElementById('ticketUTR').innerText = utr;
 
-        // Add Bus
-        document.getElementById('formBus').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                await addDoc(collection(db, "buses"), {
-                    operator: document.getElementById('bOp').value,
-                    source: document.getElementById('bSrc').value.toLowerCase().trim(),
-                    destination: document.getElementById('bDst').value.toLowerCase().trim(),
-                    time: document.getElementById('bTime').value,
-                    price: Number(document.getElementById('bPrice').value),
-                    createdAt: serverTimestamp()
-                });
-                showNotification("✅ Bus saved successfully!");
-                e.target.reset();
-            } catch (error) { showNotification("❌ Error saving bus!", true); }
-        });
+            // Trigger WhatsApp Alert to Admin
+            sendWhatsAppAlert(utr);
+        }
 
-        // Add Package
-        document.getElementById('formPackage').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                await addDoc(collection(db, "packages"), {
-                    title: document.getElementById('pTitle').value,
-                    location: document.getElementById('pLoc').value.toLowerCase().trim(),
-                    duration: document.getElementById('pDur').value,
-                    price: Number(document.getElementById('pPrice').value),
-                    image: document.getElementById('pImg').value,
-                    createdAt: serverTimestamp()
-                });
-                showNotification("✅ Package saved successfully!");
-                e.target.reset();
-            } catch (error) { showNotification("❌ Error saving package!", true); }
-        });
+        function sendWhatsAppAlert(utr) {
+            const message = `*NEW BOOKING ALERT* 🚨\n\n*Journey:* ${currentBookingDetails}\n*Amount:* ₹${currentBookingAmount}\n*UTR Ref:* ${utr}\n\nPlease verify payment and confirm my ticket.`;
+            const waLink = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(message)}`;
+            
+            // Open WhatsApp in a new tab silently
+            window.open(waLink, '_blank');
+        }
 
-        // Add Hotel
-        document.getElementById('formHotel').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                await addDoc(collection(db, "hotels"), {
-                    name: document.getElementById('hName').value,
-                    location: document.getElementById('hLoc').value.toLowerCase().trim(),
-                    category: document.getElementById('hCat').value,
-                    price: Number(document.getElementById('hPrice').value),
-                    createdAt: serverTimestamp()
-                });
-                showNotification("✅ Hotel saved successfully!");
-                e.target.reset();
-            } catch (error) { showNotification("❌ Error saving hotel!", true); }
-        });
-
-        // Add Cab
-        document.getElementById('formCab').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                await addDoc(collection(db, "cabs"), {
-                    route: document.getElementById('cRoute').value,
-                    type: document.getElementById('cType').value,
-                    share: document.getElementById('cShare').value,
-                    price: Number(document.getElementById('cPrice').value),
-                    createdAt: serverTimestamp()
-                });
-                showNotification("✅ Cab saved successfully!");
-                e.target.reset();
-            } catch (error) { showNotification("❌ Error saving cab!", true); }
-        });
+        function contactSupport() {
+            const utr = document.getElementById('ticketUTR').innerText;
+            const message = `Hi, I am checking the status of my booking. My UTR is ${utr}.`;
+            window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(message)}`, '_blank');
+        }
     </script>
 </body>
 </html>
