@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Search Results | Safar Bengal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --mmt-blue: #0b4a8e;
+            --mmt-light-blue: #1a62a9;
+            --mmt-red: #eb2026;
+            --bg-gray: #e5eef5;
+            --white: #ffffff;
+            --text-dark: #4a4a4a;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Lato', sans-serif; }
+        body { background-color: var(--bg-gray); color: var(--text-dark); }
+        a { text-decoration: none; color: inherit; }
+
+        /* HEADER */
+        header {
+            background-color: var(--white); padding: 15px 5%; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 24px; font-weight: 900; color: var(--mmt-blue); }
+        .logo span { color: var(--mmt-red); }
+
+        /* SEARCH MODIFY BAR */
+        .modify-search-bar {
+            background: var(--mmt-blue); color: white; padding: 15px 5%;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .route-info { display: flex; align-items: center; gap: 15px; }
+        .route-info h2 { font-size: 20px; font-weight: 900; }
+        .route-info p { font-size: 14px; font-weight: 700; opacity: 0.9; }
+        .btn-modify {
+            background: rgba(255,255,255,0.2); border: 1px solid white; color: white;
+            padding: 8px 20px; border-radius: 4px; font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        .btn-modify:hover { background: white; color: var(--mmt-blue); }
+
+        /* MAIN LAYOUT */
+        .layout-container {
+            display: grid; grid-template-columns: 280px 1fr; gap: 25px;
+            max-width: 1200px; margin: 30px auto; padding: 0 5%;
+        }
+
+        /* FILTERS SIDEBAR */
+        .sidebar-filters {
+            background: var(--white); border-radius: 8px; padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 90px;
+        }
+        .sidebar-filters h3 { font-size: 18px; font-weight: 900; margin-bottom: 20px; color: #000; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .filter-group { margin-bottom: 25px; }
+        .filter-group h4 { font-size: 14px; font-weight: 900; color: #333; margin-bottom: 12px; text-transform: uppercase; }
+        
+        .checkbox-label {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+            cursor: pointer; font-size: 14px; font-weight: 700; color: #555;
+        }
+        .checkbox-label input { width: 16px; height: 16px; cursor: pointer; }
+
+        /* RESULTS AREA */
+        .results-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .results-header h2 { font-size: 22px; font-weight: 900; color: #000; }
+
+        .bus-card {
+            background: var(--white); border-radius: 8px; padding: 25px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eee; transition: 0.3s;
+        }
+        .bus-card:hover { box-shadow: var(--shadow); border-color: #d4e3f2; }
+        
+        .bus-details h3 { font-size: 22px; color: #000; margin-bottom: 5px; font-weight: 900; }
+        .bus-details p { color: #666; font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+        .bus-amenities { display: flex; gap: 15px; margin-top: 10px; color: #888; font-size: 13px; }
+        
+        .bus-action { text-align: right; }
+        .bus-action h2 { font-size: 28px; color: #000; font-weight: 900; margin-bottom: 10px; }
+        
+        .btn-view-seats {
+            background-color: var(--mmt-red); color: white; border: none; padding: 12px 30px;
+            border-radius: 4px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 14px;
+        }
+
+        .loader-container { text-align: center; padding: 50px; font-size: 18px; font-weight: 700; color: #666; }
+        .no-results { text-align: center; padding: 50px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .no-results h2 { color: var(--mmt-red); margin-bottom: 10px; font-weight: 900; }
+
+        @media (max-width: 768px) {
+            .layout-container { grid-template-columns: 1fr; }
+            .sidebar-filters { display: none; } /* Hide filters on mobile for now */
+            .bus-card { flex-direction: column; text-align: left; align-items: flex-start; gap: 20px; }
+            .bus-action { text-align: left; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><a href="index.html">Safar<span>Bengal</span></a></div>
+    </header>
+
+    <!-- MODIFY SEARCH BAR -->
+    <div class="modify-search-bar">
+        <div class="route-info">
+            <h2 id="displayRoute">Loading...</h2>
+            <p id="displayDate">Loading date...</p>
+        </div>
+        <a href="index.html"><button class="btn-modify">Modify</button></a>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="layout-container">
+        
+        <!-- SIDEBAR FILTERS -->
+        <aside class="sidebar-filters">
+            <h3>Filters</h3>
+            
+            <div class="filter-group">
+                <h4>Bus Type</h4>
+                <label class="checkbox-label"><input type="checkbox"> AC</label>
+                <label class="checkbox-label"><input type="checkbox"> Non-AC</label>
+                <label class="checkbox-label"><input type="checkbox"> Sleeper</label>
+                <label class="checkbox-label"><input type="checkbox"> Seater</label>
+            </div>
+
+            <div class="filter-group">
+                <h4>Departure Time</h4>
+                <label class="checkbox-label"><input type="checkbox"> Before 6 AM</label>
+                <label class="checkbox-label"><input type="checkbox"> 6 AM to 12 PM</label>
+                <label class="checkbox-label"><input type="checkbox"> 12 PM to 6 PM</label>
+                <label class="checkbox-label"><input type="checkbox"> After 6 PM</label>
+            </div>
+        </aside>
+
+        <!-- RESULTS LIST -->
+        <main>
+            <div class="results-header">
+                <h2 id="resultCount">0 Buses Found</h2>
+            </div>
+            
+            <div id="busListContainer">
+                <div class="loader-container">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 30px; margin-bottom: 15px; color: var(--mmt-blue);"></i>
+                    <p>Searching for the best buses...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhBIBmNRRIJDPLBXqmWErVa1OAlEN_VAM", 
+            authDomain: "mentlify-8cbbf.firebaseapp.com",
+            projectId: "mentlify-8cbbf",
+            storageBucket: "mentlify-8cbbf.firebasestorage.app",
+            messagingSenderId: "565118088482",
+            appId: "1:565118088482:web:628ad1e279e91fcc6aa17b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Parse URL Parameters from index.html form submission
+        const urlParams = new URLSearchParams(window.location.search);
+        const sourceParam = urlParams.get('source') || 'Siliguri';
+        const destParam = urlParams.get('destination') || 'Kolkata';
+        const dateParam = urlParams.get('date') || new Date().toISOString().split('T')[0];
+
+        // Update UI with search parameters
+        document.getElementById('displayRoute').innerText = `${sourceParam.toUpperCase()} ➔ ${destParam.toUpperCase()}`;
+        document.getElementById('displayDate').innerText = new Date(dateParam).toDateString();
+
+        // Fetch data from Firebase
+        async function fetchBuses() {
+            const container = document.getElementById('busListContainer');
+            const countHeader = document.getElementById('resultCount');
+            
+            try {
+                // Formatting to lowercase to match the exact data saved from the admin panel
+                const q = query(
+                    collection(db, "buses"), 
+                    where("source", "==", sourceParam.toLowerCase().trim()), 
+                    where("destination", "==", destParam.toLowerCase().trim())
+                );
+                
+                const querySnapshot = await getDocs(q);
+                container.innerHTML = ''; 
+
+                if (querySnapshot.empty) {
+                    countHeader.innerText = "0 Buses Found";
+                    container.innerHTML = `
+                        <div class="no-results">
+                            <h2>No Buses Available</h2>
+                            <p style="font-weight:700; color:#666;">We couldn't find any buses for this route on the selected date.</p>
+                            <a href="index.html" style="display:inline-block; margin-top:20px; color:var(--mmt-blue); font-weight:900;">Modify Search</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let count = 0;
+                querySnapshot.forEach((doc) => {
+                    count++;
+                    const bus = doc.data();
+                    
+                    // Create Bus Card
+                    const card = `
+                        <div class="bus-card">
+                            <div class="bus-details">
+                                <h3>${bus.operator}</h3>
+                                <p>Departure: ${bus.time} | A/C Seater/Sleeper</p>
+                                <div class="bus-amenities">
+                                    <span><i class="fas fa-wifi"></i> WiFi</span>
+                                    <span><i class="fas fa-plug"></i> Charging Point</span>
+                                    <span><i class="fas fa-bottle-water"></i> Water Bottle</span>
+                                </div>
+                            </div>
+                            <div class="bus-action">
+                                <h2>₹${bus.price}</h2>
+                                <!-- Passing Bus ID and details in URL to the next page -->
+                                <a href="seat-selection.html?busId=${doc.id}&operator=${encodeURIComponent(bus.operator)}&price=${bus.price}&time=${encodeURIComponent(bus.time)}&source=${encodeURIComponent(sourceParam)}&dest=${encodeURIComponent(destParam)}">
+                                    <button class="btn-view-seats">VIEW SEATS</button>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+                
+                countHeader.innerText = `${count} Buses Found`;
+
+            } catch (error) {
+                console.error("Error fetching buses:", error);
+                container.innerHTML = `<div class="no-results"><h2>Error loading data.</h2></div>`;
+            }
+        }
+
+        // Run fetch on load
+        fetchBuses();
+    </script>
+</body>
+</html>
