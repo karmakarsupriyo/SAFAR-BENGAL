@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safar Bengal | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #eb2026;
+            --sidebar-bg: #0b4a8e;
+            --bg-color: #f4f7f6;
+            --text-dark: #333;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+        }
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .brand {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .brand h2 { margin: 0; color: #fff; font-weight: 600; }
+        .brand span { font-size: 12px; color: #ccc; text-transform: uppercase; }
+        .nav-buttons { display: flex; flex-direction: column; padding-top: 20px; }
+        .tab-btn {
+            background: transparent; border: none; color: #ccc;
+            padding: 18px 25px; text-align: left; font-size: 15px;
+            font-family: 'Poppins', sans-serif; cursor: pointer;
+            transition: all 0.3s ease; border-left: 4px solid transparent;
+        }
+        .tab-btn:hover { background-color: rgba(255,255,255,0.05); color: white; }
+        .tab-btn.active {
+            background-color: rgba(0,0,0,0.2); color: white;
+            border-left: 4px solid var(--primary); font-weight: 600;
+        }
+        .main-content {
+            margin-left: 260px; padding: 40px;
+            width: calc(100% - 260px); box-sizing: border-box;
+        }
+        .header h1 { margin: 0 0 30px 0; color: var(--text-dark); font-size: 28px; }
+        .form-section {
+            background: white; padding: 35px; border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05); display: none;
+            max-width: 800px;
+        }
+        .form-section.active { display: block; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: span 2; }
+        label { font-size: 14px; color: #555; margin-bottom: 8px; font-weight: 600; }
+        input, select {
+            padding: 12px 15px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 15px; font-family: 'Poppins', sans-serif;
+            outline: none; transition: border 0.3s;
+        }
+        input:focus, select:focus { border-color: var(--sidebar-bg); }
+        button.submit-btn {
+            background-color: var(--primary); color: white; border: none;
+            padding: 15px; font-size: 16px; font-weight: 600; border-radius: 6px;
+            cursor: pointer; margin-top: 20px; grid-column: span 2; transition: 0.3s;
+        }
+        button.submit-btn:hover { background-color: #c0392b; }
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #333;
+            color: #fff; text-align: center; border-radius: 8px; padding: 16px;
+            position: fixed; z-index: 1000; left: 50%; bottom: 30px;
+            transform: translateX(-50%); font-size: 15px;
+        }
+        #toast.show { visibility: visible; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand">
+            <h2>Safar Bengal</h2>
+            <span>Admin Control Panel</span>
+        </div>
+        <div class="nav-buttons">
+            <button class="tab-btn active" onclick="switchTab('busSection', this, 'Add New Bus Route')">🚌 Manage Buses</button>
+            <button class="tab-btn" onclick="switchTab('packageSection', this, 'Add Holiday Package')">🏖️ Manage Packages</button>
+            <button class="tab-btn" onclick="switchTab('hotelSection', this, 'Add Hotel Listing')">🏨 Manage Hotels</button>
+            <button class="tab-btn" onclick="switchTab('cabSection', this, 'Add New Cab Route')">🚖 Manage Cabs</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 id="pageTitle">Add New Bus Route</h1>
+        </div>
+
+        <!-- BUS FORM -->
+        <div id="busSection" class="form-section active">
+            <form id="formBus">
+                <div class="form-grid">
+                    <div class="form-group full-width"><label>Operator Name</label><input type="text" id="bOp" required></div>
+                    <div class="form-group"><label>Source</label><input type="text" id="bSrc" required></div>
+                    <div class="form-group"><label>Destination</label><input type="text" id="bDst" required></div>
+                    <div class="form-group"><label>Time</label><input type="time" id="bTime" required></div>
+                    <div class="form-group"><label>Price (₹)</label><input type="number" id="bPrice" required></div>
+                    <button type="submit" class="submit-btn">Save Bus</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PACKAGE FORM -->
+        <div id="packageSection" class="form-section">
+            <form id="formPackage">
+                <div class="form-grid">
+                    <div class="form-group full-width"><label>Package Title</label><input type="text" id="pTitle" required></div>
+                    <div class="form-group"><label>Location</label><input type="text" id="pLoc" required></div>
+                    <div class="form-group"><label>Duration</label><input type="text" id="pDur" required></div>
+                    <div class="form-group"><label>Price (₹)</label><input type="number" id="pPrice" required></div>
+                    <div class="form-group full-width"><label>Image URL</label><input type="url" id="pImg" required></div>
+                    <button type="submit" class="submit-btn">Save Package</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- HOTEL FORM -->
+        <div id="hotelSection" class="form-section">
+            <form id="formHotel">
+                <div class="form-grid">
+                    <div class="form-group full-width"><label>Hotel Name</label><input type="text" id="hName" required></div>
+                    <div class="form-group"><label>Location</label><input type="text" id="hLoc" required></div>
+                    <div class="form-group"><label>Category</label>
+                        <select id="hCat">
+                            <option>Budget</option><option>3 Star</option><option>4 Star</option><option>Resort</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Price Per Night (₹)</label><input type="number" id="hPrice" required></div>
+                    <button type="submit" class="submit-btn">Save Hotel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- CAB FORM -->
+        <div id="cabSection" class="form-section">
+            <form id="formCab">
+                <div class="form-grid">
+                    <div class="form-group full-width"><label>Route</label><input type="text" id="cRoute" required></div>
+                    <div class="form-group"><label>Vehicle Type</label>
+                        <select id="cType"><option>Hatchback</option><option>Sedan</option><option>SUV</option></select>
+                    </div>
+                    <div class="form-group"><label>Category</label>
+                        <select id="cShare"><option>Private</option><option>Shared</option></select>
+                    </div>
+                    <div class="form-group full-width"><label>Price (₹)</label><input type="number" id="cPrice" required></div>
+                    <button type="submit" class="submit-btn">Save Cab</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast">Message</div>
+
+    <!-- UI Logic -->
+    <script>
+        function switchTab(sectionId, btnElement, title) {
+            document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            btnElement.classList.add('active');
+            document.getElementById('pageTitle').innerText = title;
+        }
+
+        function showNotification(msg, isError = false) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.style.backgroundColor = isError ? "#e74c3c" : "#2ecc71";
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+    </script>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Your Firebase Configuration from the image
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhBIBmNRRIJDPLBXqmWErVa1OAlEN_VAM", 
+            authDomain: "mentlify-8cbbf.firebaseapp.com",
+            projectId: "mentlify-8cbbf",
+            storageBucket: "mentlify-8cbbf.firebasestorage.app",
+            messagingSenderId: "565118088482",
+            appId: "1:565118088482:web:628ad1e279e91fcc6aa17b",
+            measurementId: "G-5W93R6ELBN"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Add Bus
+        document.getElementById('formBus').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await addDoc(collection(db, "buses"), {
+                    operator: document.getElementById('bOp').value,
+                    source: document.getElementById('bSrc').value.toLowerCase().trim(),
+                    destination: document.getElementById('bDst').value.toLowerCase().trim(),
+                    time: document.getElementById('bTime').value,
+                    price: Number(document.getElementById('bPrice').value),
+                    createdAt: serverTimestamp()
+                });
+                showNotification("✅ Bus saved successfully!");
+                e.target.reset();
+            } catch (error) { showNotification("❌ Error saving bus!", true); }
+        });
+
+        // Add Package
+        document.getElementById('formPackage').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await addDoc(collection(db, "packages"), {
+                    title: document.getElementById('pTitle').value,
+                    location: document.getElementById('pLoc').value.toLowerCase().trim(),
+                    duration: document.getElementById('pDur').value,
+                    price: Number(document.getElementById('pPrice').value),
+                    image: document.getElementById('pImg').value,
+                    createdAt: serverTimestamp()
+                });
+                showNotification("✅ Package saved successfully!");
+                e.target.reset();
+            } catch (error) { showNotification("❌ Error saving package!", true); }
+        });
+
+        // Add Hotel
+        document.getElementById('formHotel').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await addDoc(collection(db, "hotels"), {
+                    name: document.getElementById('hName').value,
+                    location: document.getElementById('hLoc').value.toLowerCase().trim(),
+                    category: document.getElementById('hCat').value,
+                    price: Number(document.getElementById('hPrice').value),
+                    createdAt: serverTimestamp()
+                });
+                showNotification("✅ Hotel saved successfully!");
+                e.target.reset();
+            } catch (error) { showNotification("❌ Error saving hotel!", true); }
+        });
+
+        // Add Cab
+        document.getElementById('formCab').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await addDoc(collection(db, "cabs"), {
+                    route: document.getElementById('cRoute').value,
+                    type: document.getElementById('cType').value,
+                    share: document.getElementById('cShare').value,
+                    price: Number(document.getElementById('cPrice').value),
+                    createdAt: serverTimestamp()
+                });
+                showNotification("✅ Cab saved successfully!");
+                e.target.reset();
+            } catch (error) { showNotification("❌ Error saving cab!", true); }
+        });
+    </script>
+</body>
+</html>
