@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout | Safar Bengal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --mmt-blue: #0b4a8e;
+            --mmt-red: #eb2026;
+            --mmt-green: #26b5a9;
+            --bg-gray: #e5eef5;
+            --white: #ffffff;
+            --text-dark: #4a4a4a;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Lato', sans-serif; }
+        body { background-color: var(--bg-gray); color: var(--text-dark); }
+        a { text-decoration: none; color: inherit; }
+
+        /* HEADER */
+        header {
+            background-color: var(--white); padding: 15px 5%; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 24px; font-weight: 900; color: var(--mmt-blue); }
+        .logo span { color: var(--mmt-red); }
+        .secure-badge { font-weight: 900; color: #27ae60; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+
+        /* MAIN LAYOUT */
+        .layout-container {
+            display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;
+            max-width: 1100px; margin: 40px auto; padding: 0 5%;
+        }
+
+        /* LEFT: SUMMARY & PASSENGER DETAILS */
+        .left-column { display: flex; flex-direction: column; gap: 20px; }
+        
+        .card-section {
+            background: var(--white); border-radius: 12px; padding: 30px;
+            box-shadow: var(--shadow);
+        }
+        .section-title { font-size: 20px; font-weight: 900; color: #000; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        
+        .booking-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .summary-item label { font-size: 12px; color: #888; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .summary-item p { font-size: 16px; font-weight: 900; color: #333; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: span 2; }
+        .form-group label { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #555; }
+        .form-group input { padding: 12px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; font-weight: 700; outline: none; transition: 0.3s; }
+        .form-group input:focus { border-color: var(--mmt-blue); box-shadow: 0 0 0 3px rgba(11, 74, 142, 0.1); }
+
+        /* RIGHT: PAYMENT SECTION */
+        .payment-section {
+            background: var(--white); border-radius: 12px; padding: 30px;
+            box-shadow: var(--shadow); height: fit-content; position: sticky; top: 90px;
+            text-align: center; border-top: 6px solid var(--mmt-blue);
+        }
+        .amount-display { margin-bottom: 20px; }
+        .amount-display p { font-size: 14px; font-weight: 700; color: #666; text-transform: uppercase; }
+        .amount-display h2 { font-size: 36px; font-weight: 900; color: var(--mmt-red); margin-top: 5px; }
+
+        .payment-instruction { background: #f4f8ff; padding: 15px; border-radius: 8px; border: 1px solid #d4e3f2; margin-bottom: 25px; text-align: left; }
+        .payment-instruction h4 { color: var(--mmt-blue); font-size: 15px; font-weight: 900; margin-bottom: 10px; }
+        .payment-instruction ol { margin-left: 20px; font-size: 13px; font-weight: 700; color: #555; line-height: 1.6; }
+
+        /* Desktop QR Code */
+        .qr-box { border: 2px dashed #ccc; padding: 10px; border-radius: 12px; width: 180px; height: 180px; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; }
+        .qr-box img { width: 100%; height: 100%; border-radius: 8px; }
+        .desktop-hint { font-size: 12px; font-weight: 700; color: #888; margin-bottom: 25px; }
+
+        /* Mobile Payment Button */
+        .mobile-pay-btn {
+            display: none; background: #673AB7; color: white; border: none; padding: 16px;
+            width: 100%; border-radius: 8px; font-size: 16px; font-weight: 900; cursor: pointer;
+            margin-bottom: 25px; box-shadow: 0 4px 15px rgba(103, 58, 183, 0.4); text-decoration: none;
+        }
+
+        .utr-section { text-align: left; border-top: 1px solid #eee; padding-top: 20px; }
+        .utr-section label { font-size: 14px; font-weight: 900; color: #333; display: block; margin-bottom: 10px; }
+        .utr-input { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 18px; font-weight: 900; outline: none; text-transform: uppercase; letter-spacing: 2px; text-align: center; }
+        .utr-input:focus { border-color: var(--mmt-green); }
+
+        .btn-confirm {
+            background: linear-gradient(90deg, #26b5a9, #209f94); color: white; border: none;
+            width: 100%; padding: 18px; font-size: 16px; font-weight: 900; border-radius: 8px;
+            cursor: pointer; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(38, 181, 169, 0.4);
+        }
+        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(38, 181, 169, 0.5); }
+
+        @media (max-width: 768px) {
+            .layout-container { grid-template-columns: 1fr; }
+            .qr-box, .desktop-hint { display: none; }
+            .mobile-pay-btn { display: block; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><a href="index.html">Safar<span>Bengal</span></a></div>
+        <div class="secure-badge"><i class="fas fa-lock"></i> 100% Secure Checkout</div>
+    </header>
+
+    <div class="layout-container">
+        
+        <!-- LEFT: BOOKING SUMMARY & DETAILS -->
+        <div class="left-column">
+            
+            <div class="card-section">
+                <h3 class="section-title">Review Journey Details</h3>
+                <div class="booking-summary-grid">
+                    <div class="summary-item">
+                        <label>Route</label>
+                        <p id="dispRoute">Loading...</p>
+                    </div>
+                    <div class="summary-item">
+                        <label>Operator</label>
+                        <p id="dispOperator">Loading...</p>
+                    </div>
+                    <div class="summary-item">
+                        <label>Departure Time</label>
+                        <p id="dispTime">Loading...</p>
+                    </div>
+                    <div class="summary-item">
+                        <label>Selected Seats</label>
+                        <p id="dispSeats" style="color: var(--mmt-blue);">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-section">
+                <h3 class="section-title">Passenger Details</h3>
+                <form id="passengerForm">
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label>Full Name</label>
+                            <input type="text" id="passName" placeholder="Enter full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mobile Number (For WhatsApp Ticket)</label>
+                            <input type="tel" id="passPhone" placeholder="10-digit mobile number" required pattern="[0-9]{10}">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="passEmail" placeholder="Email for receipt" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- RIGHT: PAYMENT SECTION -->
+        <div class="payment-section">
+            <div class="amount-display">
+                <p>Total Amount to Pay</p>
+                <h2>₹<span id="dispAmount">0</span></h2>
+            </div>
+
+            <div class="payment-instruction">
+                <h4><i class="fas fa-bolt" style="color: #f39c12;"></i> Direct Zero-Commission UPI</h4>
+                <ol>
+                    <li>Scan the QR code or click the Pay button.</li>
+                    <li>Complete the payment on your UPI app.</li>
+                    <li>Copy the 12-digit UTR/Reference number.</li>
+                    <li>Paste it below to confirm your ticket.</li>
+                </ol>
+            </div>
+
+            <!-- QR Code (Desktop) -->
+            <div class="qr-box">
+                <img id="qrImage" src="" alt="UPI QR Code">
+            </div>
+            <p class="desktop-hint">Scan via Google Pay, PhonePe, or Paytm</p>
+
+            <!-- Magic Deep Link (Mobile) -->
+            <a href="#" id="mobilePayLink" class="mobile-pay-btn">
+                <i class="fas fa-mobile-alt"></i> Tap to Pay via UPI App
+            </a>
+
+            <div class="utr-section">
+                <label>Enter 12-Digit UTR / Reference No.</label>
+                <input type="text" id="utrNumber" class="utr-input" placeholder="e.g. 321456789012" maxlength="12">
+                <button class="btn-confirm" onclick="verifyAndProceed()">Confirm Ticket <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. Get URL Parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const operator = urlParams.get('operator') || 'Safar Bengal Operator';
+        const route = urlParams.get('route') || 'Siliguri to Kolkata';
+        const time = urlParams.get('time') || '06:00 PM';
+        const seats = urlParams.get('seats') || 'None';
+        const amount = urlParams.get('amount') || '0';
+
+        // 2. Populate Summary UI
+        document.getElementById('dispRoute').innerText = route;
+        document.getElementById('dispOperator').innerText = operator;
+        document.getElementById('dispTime').innerText = time;
+        document.getElementById('dispSeats').innerText = seats;
+        document.getElementById('dispAmount').innerText = amount;
+
+        // 3. Generate Dynamic UPI Links
+        const UPI_ID = "7679975939-1@okbizaxis";
+        const BUSINESS_NAME = "Safar Bengal";
+        
+        // Ensure amount is valid to prevent API errors
+        if(amount > 0) {
+            const upiLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(BUSINESS_NAME)}&am=${amount}&cu=INR&tn=Bus Ticket ${seats}`;
+            
+            // Set QR Code Image Source
+            document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}`;
+            
+            // Set Mobile Deep Link
+            document.getElementById('mobilePayLink').href = upiLink;
+        } else {
+            alert("Error: Invalid booking amount. Please select seats again.");
+            window.location.href = "index.html";
+        }
+
+        // 4. Verify UTR & Redirect
+        window.verifyAndProceed = function() {
+            // Validate form
+            const name = document.getElementById('passName').value.trim();
+            const phone = document.getElementById('passPhone').value.trim();
+            const email = document.getElementById('passEmail').value.trim();
+            const utr = document.getElementById('utrNumber').value.trim();
+
+            if(!name || !phone || !email) {
+                alert("Please fill in all passenger details.");
+                return;
+            }
+            if(phone.length !== 10) {
+                alert("Please enter a valid 10-digit mobile number.");
+                return;
+            }
+            if(utr.length < 12) {
+                alert("Please enter a valid 12-digit UTR / Reference Number from your payment app.");
+                return;
+            }
+
+            // Route to Provisional Ticket Page, passing all data needed to generate the ticket and WhatsApp alert
+            const nextUrl = `provisional-ticket.html?operator=${encodeURIComponent(operator)}&route=${encodeURIComponent(route)}&seats=${encodeURIComponent(seats)}&amount=${amount}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&utr=${encodeURIComponent(utr)}`;
+            
+            window.location.href = nextUrl;
+        }
+    </script>
+</body>
+</html>
