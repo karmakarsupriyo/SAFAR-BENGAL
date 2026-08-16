@@ -3,237 +3,552 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safar Bengal | Premium Travel Ecosystem</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Safar Bengal | Premium Travel Booking</title>
+    
+    <!-- Google Fonts: Lato (MakeMyTrip Style) -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* =========================================
+           1. CORE DESIGN SYSTEM (MMT THEME)
+           ========================================= */
         :root {
-            --brand-blue: #0A2239;
-            --brand-red: #D32F2F;
-            --brand-green: #2ecc71;
-            --bg-light: #F4F7F6;
+            --mmt-blue: #0b4a8e;
+            --mmt-light-blue: #1a62a9;
+            --mmt-red: #eb2026;
+            --mmt-green: #26b5a9;
+            --bg-gray: #e5eef5;
             --white: #ffffff;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --text-dark: #4a4a4a;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Nunito', sans-serif; background-color: var(--bg-light); color: #333; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Lato', sans-serif; }
+        body { background-color: var(--bg-gray); color: var(--text-dark); overflow-x: hidden; }
 
-        /* HEADER */
+        /* =========================================
+           2. HEADER & TRIPLE DOT MENU
+           ========================================= */
         header {
-            background: var(--white); padding: 15px 5%; display: flex;
+            background-color: var(--white); padding: 12px 5%; display: flex;
             justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
         }
-        .logo { font-size: 26px; font-weight: 900; color: var(--brand-blue); cursor: pointer; }
-        .logo span { color: var(--brand-red); }
+        .logo { font-size: 24px; font-weight: 900; color: var(--mmt-blue); cursor: pointer; }
+        .logo span { color: var(--mmt-red); }
+        
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .login-btn {
+            background: linear-gradient(90deg, #008cff, #007aff); color: white;
+            border: none; padding: 8px 20px; border-radius: 4px; font-weight: 700;
+            font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+        }
+        
+        .dropdown { position: relative; display: inline-block; }
+        .dropbtn { background: none; border: none; font-size: 20px; color: var(--text-dark); cursor: pointer; padding: 5px 10px; }
+        .dropdown-content {
+            display: none; position: absolute; right: 0; background-color: white;
+            min-width: 220px; box-shadow: var(--shadow); border-radius: 8px; z-index: 1001; overflow: hidden; top: 40px;
+        }
+        .dropdown-content a {
+            color: #333; padding: 15px; text-decoration: none; display: block;
+            font-weight: 700; font-size: 14px; border-bottom: 1px solid #f1f1f1;
+        }
+        .dropdown-content a:hover { background-color: #f8f8f8; color: var(--mmt-blue); }
+        .show { display: block; }
 
-        /* VIEWS */
-        .view-section { display: none; padding: 40px 5%; animation: fadeIn 0.5s; max-width: 1000px; margin: 0 auto; }
+        /* =========================================
+           3. VIEW SECTIONS (SPA LOGIC)
+           ========================================= */
+        .view-section { display: none; animation: fadeIn 0.4s; }
         .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* BUS CARD */
+        /* =========================================
+           4. MMT HERO & SEARCH WIDGET
+           ========================================= */
+        .hero-section {
+            background: linear-gradient(to bottom, var(--mmt-blue) 0%, var(--mmt-light-blue) 100%);
+            padding: 40px 5% 100px; text-align: center; color: white;
+        }
+        .hero-section h1 { font-size: 28px; margin-bottom: 10px; font-weight: 900; }
+        
+        .search-widget {
+            background: var(--white); max-width: 1100px; margin: -60px auto 40px;
+            border-radius: 12px; box-shadow: var(--shadow); position: relative; padding-bottom: 30px;
+        }
+        
+        /* Search Tabs */
+        .tabs {
+            display: flex; justify-content: center; background: #fff;
+            border-radius: 12px 12px 0 0; border-bottom: 1px solid #ebf0f4; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .tab {
+            padding: 20px 30px; cursor: pointer; font-weight: 700; color: #4a4a4a;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            border-bottom: 3px solid transparent; transition: 0.3s; font-size: 14px;
+        }
+        .tab i { font-size: 22px; color: #999; }
+        .tab:hover i, .tab.active i { color: var(--mmt-blue); }
+        .tab.active { color: var(--mmt-blue); border-bottom: 3px solid var(--mmt-blue); }
+
+        /* Search Forms */
+        .search-form { display: none; padding: 30px; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .search-form.active { display: grid; }
+        
+        .input-box {
+            border: 1px solid #dfdfdf; border-radius: 8px; padding: 10px 15px;
+            display: flex; flex-direction: column; background: #fff; cursor: text;
+        }
+        .input-box:hover { background: #f4f8ff; }
+        .input-box label { font-size: 14px; color: #4a4a4a; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        .input-box input { border: none; outline: none; font-size: 22px; font-weight: 900; color: #000; background: transparent; width: 100%; }
+        
+        /* Floating Search Button */
+        .btn-search-container { text-align: center; margin-top: -25px; position: relative; z-index: 10; height: 0; }
+        .btn-search {
+            background: linear-gradient(90deg, #008cff, #007aff); color: white; border: none;
+            padding: 15px 60px; font-size: 20px; font-weight: 900; border-radius: 30px;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0, 140, 255, 0.4); transition: 0.3s; text-transform: uppercase;
+        }
+        .btn-search:hover { transform: scale(1.05); }
+
+        /* =========================================
+           5. RESULTS AREA & BUS CARDS
+           ========================================= */
+        .results-area { max-width: 1000px; margin: 60px auto 40px; padding: 0 5%; }
         .bus-card {
-            background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px;
-            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);
+            background: var(--white); border-radius: 8px; padding: 20px; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #eee; transition: 0.3s;
         }
-        .btn-pay {
-            background: var(--brand-green); color: white; border: none; padding: 12px 30px;
-            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;
-            transition: 0.3s; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        .bus-card:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .bus-info h3 { font-size: 20px; color: #000; margin-bottom: 5px; font-weight: 900; }
+        .bus-info p { color: #777; font-size: 14px; font-weight: 700; }
+        .price-col { text-align: right; }
+        .price-col h2 { font-size: 24px; color: #000; font-weight: 900; margin-bottom: 10px; }
+        .btn-view-seats {
+            background-color: var(--mmt-red); color: white; border: none; padding: 10px 25px;
+            border-radius: 4px; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 12px;
         }
-        .btn-pay:hover { transform: translateY(-2px); }
 
-        /* PAYMENT MODAL */
+        /* =========================================
+           6. SEAT SELECTION & PAYMENT MODALS
+           ========================================= */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;
         }
-        .payment-box {
-            background: white; width: 100%; max-width: 450px; border-radius: 16px;
-            padding: 30px; text-align: center; position: relative;
+        .modal-box {
+            background: white; width: 90%; max-width: 450px; border-radius: 12px;
+            padding: 25px; position: relative; max-height: 90vh; overflow-y: auto;
         }
-        .close-modal {
-            position: absolute; top: 15px; right: 20px; background: none; border: none;
-            font-size: 24px; cursor: pointer; color: #888;
-        }
-        .qr-placeholder {
-            width: 200px; height: 200px; margin: 20px auto; border: 2px dashed #ccc;
-            display: flex; justify-content: center; align-items: center; border-radius: 8px;
-        }
-        .mobile-pay-btn {
-            display: none; background: #673AB7; color: white; padding: 15px; width: 100%;
-            border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 18px; margin: 20px 0;
-        }
-        @media (max-width: 768px) {
-            .qr-placeholder { display: none; }
-            .mobile-pay-btn { display: block; }
-        }
-        .utr-input-group { margin-top: 25px; text-align: left; }
-        .utr-input-group label { font-weight: bold; color: #555; display: block; margin-bottom: 8px; }
-        .utr-input {
-            width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px;
-            font-size: 16px; outline: none; font-weight: bold; text-transform: uppercase;
-        }
-        .utr-input:focus { border-color: var(--brand-blue); }
-        .btn-verify {
-            background: var(--brand-blue); color: white; border: none; width: 100%; padding: 15px;
-            font-size: 16px; font-weight: bold; border-radius: 8px; margin-top: 15px; cursor: pointer;
-        }
-
-        /* PROVISIONAL TICKET */
-        .ticket-box {
-            background: white; border-radius: 16px; padding: 40px; text-align: center;
-            box-shadow: var(--shadow); border-top: 8px solid #f1c40f;
-        }
-        .ticket-status { color: #f39c12; font-weight: 900; font-size: 24px; margin-bottom: 10px; }
-        .ticket-loader { border: 4px solid #f3f3f3; border-top: 4px solid #f39c12; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
-        .ticket-details { background: #f9f9f9; padding: 20px; border-radius: 8px; text-align: left; margin: 25px 0; }
+        .close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 22px; cursor: pointer; color: #888; }
         
+        /* Seat Grid */
+        .bus-layout { display: grid; grid-template-columns: 1fr 1fr 30px 1fr 1fr; gap: 12px; background: #f4f8ff; padding: 20px; border-radius: 8px; border: 1px solid #d4e3f2; margin-top: 15px; }
+        .seat {
+            width: 45px; height: 45px; background: white; border: 2px solid #ccc; border-radius: 6px 6px 2px 2px;
+            cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 900; color: #666; transition: 0.2s;
+        }
+        .seat.available:hover { border-color: var(--mmt-blue); }
+        .seat.selected { background: var(--mmt-blue); color: white; border-color: var(--mmt-blue); }
+        .seat.booked { background: #e0e0e0; border-color: #ccc; cursor: not-allowed; color: #aaa; }
+        .aisle { grid-column: 3; }
+        .btn-book { background: var(--mmt-blue); color: white; width: 100%; padding: 15px; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; margin-top: 20px; cursor: pointer; text-transform: uppercase; }
+
+        /* Payment UI */
+        .qr-placeholder { width: 180px; height: 180px; margin: 15px auto; border: 2px solid #eee; border-radius: 8px; padding: 5px; }
+        .mobile-pay-btn { display: none; background: #673AB7; color: white; padding: 15px; width: 100%; border-radius: 8px; text-decoration: none; font-weight: 900; font-size: 16px; margin: 15px 0; }
+        @media (max-width: 768px) { .qr-placeholder, .desktop-only { display: none; } .mobile-pay-btn { display: block; } .search-form { grid-template-columns: 1fr; } }
+        .utr-input { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; font-weight: 900; outline: none; margin-top: 10px; text-transform: uppercase; }
+        .btn-verify { background: var(--mmt-green); color: white; border: none; width: 100%; padding: 15px; font-size: 16px; font-weight: 900; border-radius: 8px; margin-top: 15px; cursor: pointer; }
+
+        /* =========================================
+           7. PROVISIONAL TICKET
+           ========================================= */
+        .ticket-wrapper { max-width: 600px; margin: 50px auto; padding: 0 5%; }
+        .ticket-box { background: white; border-radius: 12px; padding: 40px; text-align: center; box-shadow: var(--shadow); border-top: 8px solid #f39c12; }
+        .ticket-loader { border: 4px solid #f3f3f3; border-top: 4px solid #f39c12; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        .ticket-details { background: #f9f9f9; padding: 20px; border-radius: 8px; text-align: left; margin: 25px 0; font-size: 15px; line-height: 1.8; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* =========================================
+           8. ADMIN & OWNER PANELS
+           ========================================= */
+        .dashboard-container { max-width: 1200px; margin: 40px auto; padding: 0 5%; display: grid; grid-template-columns: 250px 1fr; gap: 30px; }
+        .dash-sidebar { background: var(--mmt-blue); color: white; padding: 20px; border-radius: 12px; min-height: 60vh; }
+        .dash-sidebar h3 { margin-bottom: 20px; font-weight: 900; }
+        .dash-sidebar ul { list-style: none; }
+        .dash-sidebar ul li { padding: 15px 10px; cursor: pointer; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .dash-sidebar ul li:hover { background: rgba(255,255,255,0.1); }
+        .dash-content { background: white; padding: 30px; border-radius: 12px; box-shadow: var(--shadow); }
+
+        /* Floating WhatsApp */
+        .whatsapp-float { position: fixed; bottom: 30px; right: 30px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; box-shadow: 0 4px 10px rgba(37,211,102,0.4); z-index: 999; text-decoration: none; }
     </style>
 </head>
 <body>
 
+    <!-- HEADER -->
     <header>
-        <div class="logo">Safar<span>Bengal</span></div>
+        <div class="logo" onclick="switchView('customer-view')">Safar<span>Bengal</span></div>
+        <div class="header-right">
+            <!-- Google Login -->
+            <button class="login-btn" onclick="googleLogin()"><i class="fab fa-google"></i> Login / Sign Up</button>
+            
+            <!-- Triple Dot Menu -->
+            <div class="dropdown">
+                <button onclick="toggleMenu()" class="dropbtn"><i class="fas fa-ellipsis-v"></i></button>
+                <div id="tripleMenu" class="dropdown-content">
+                    <a href="#" onclick="promptAccess('admin')"><i class="fas fa-user-shield"></i> Master Admin Panel</a>
+                    <a href="#" onclick="promptAccess('owner')"><i class="fas fa-bus"></i> Bus Owner Login</a>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <!-- 1. CUSTOMER VIEW -->
+    <!-- ==========================================
+         VIEW 1: CUSTOMER MMT UI (DEFAULT)
+         ========================================== -->
     <main id="customer-view" class="view-section active">
-        <h2 style="margin-bottom: 20px;">Available Journeys</h2>
         
-        <div class="bus-card">
-            <div>
-                <h2 id="busName">Greenline Premium Volvo</h2>
-                <p style="color: #666; font-size: 16px;">Siliguri ➔ Kolkata | Departure: 06:00 PM</p>
-                <div style="color: #f39c12; margin-top: 5px;"><i class="fas fa-star"></i> 4.8 (120 Reviews)</div>
+        <div class="hero-section">
+            <h1>Exclusive Deals on Bengal Travel</h1>
+            <p style="font-weight: 700; font-size: 16px;">Buses, Cabs, Hotels & Holiday Packages</p>
+        </div>
+
+        <div class="search-widget">
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('busSearch', this)"><i class="fas fa-bus"></i> Buses</div>
+                <div class="tab" onclick="switchTab('holidaySearch', this)"><i class="fas fa-umbrella-beach"></i> Holidays</div>
+                <div class="tab" onclick="switchTab('hotelSearch', this)"><i class="fas fa-hotel"></i> Hotels</div>
+                <div class="tab" onclick="switchTab('cabSearch', this)"><i class="fas fa-taxi"></i> Cabs</div>
             </div>
-            <div style="text-align: right;">
-                <h2 style="color: var(--brand-red); font-size: 28px;">₹1,200</h2>
-                <button class="btn-pay" onclick="openPaymentModal(1200, 'Greenline Premium Volvo - SLG to CCU')">
-                    <i class="fas fa-lock"></i> Pay & Book Now
+
+            <!-- Search Forms -->
+            <form id="busSearch" class="search-form active">
+                <div class="input-box">
+                    <label><i class="fas fa-map-marker-alt" style="color:var(--mmt-blue)"></i> FROM</label>
+                    <input type="text" value="Siliguri" id="srcCity">
+                </div>
+                <div class="input-box">
+                    <label><i class="fas fa-map-marker-alt" style="color:var(--mmt-red)"></i> TO</label>
+                    <input type="text" value="Kolkata" id="dstCity">
+                </div>
+                <div class="input-box">
+                    <label><i class="far fa-calendar-alt" style="color:var(--mmt-blue)"></i> TRAVEL DATE</label>
+                    <input type="date" id="travelDate">
+                </div>
+            </form>
+            
+            <form id="holidaySearch" class="search-form">
+                <div class="input-box" style="grid-column: span 3;">
+                    <label>DESTINATION</label>
+                    <input type="text" placeholder="E.g., Darjeeling, Sundarbans">
+                </div>
+            </form>
+
+            <div class="btn-search-container">
+                <button class="btn-search" onclick="loadMockBuses()">SEARCH</button>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div class="results-area" id="resultsArea">
+            <!-- Dynamic Bus Cards will appear here via JS -->
+        </div>
+    </main>
+
+    <!-- ==========================================
+         VIEW 2: TICKET GENERATION
+         ========================================== -->
+    <main id="ticket-view" class="view-section">
+        <div class="ticket-wrapper">
+            <div class="ticket-box">
+                <i class="fas fa-clock" style="font-size: 50px; color: #f39c12; margin-bottom: 10px;"></i>
+                <h2 style="color: #f39c12; font-weight: 900; font-size: 28px;">Booking Received</h2>
+                <p style="font-size: 18px; font-weight: 700; color: #555;">Payment Verification in Progress</p>
+                
+                <div class="ticket-loader"></div>
+                <p style="color: #888; font-size: 14px; font-weight: 700;">Please wait 10-15 mins for Admin Approval.</p>
+
+                <div class="ticket-details">
+                    <p><strong>Journey:</strong> <span id="tktJourney"></span></p>
+                    <p><strong>Seats:</strong> <span id="tktSeats"></span></p>
+                    <p><strong>Total Amount:</strong> ₹<span id="tktAmount"></span></p>
+                    <p><strong>UTR Number:</strong> <span id="tktUTR"></span></p>
+                    <p><strong>Status:</strong> <span style="color: #f39c12; font-weight: 900;">PENDING</span></p>
+                </div>
+
+                <button onclick="contactWhatsAppSupport()" style="background: #25D366; color: white; border: none; padding: 15px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: 900; width: 100%;">
+                    <i class="fab fa-whatsapp"></i> Chat with Support
                 </button>
             </div>
         </div>
     </main>
 
-    <!-- 2. PAYMENT MODAL -->
-    <div class="modal-overlay" id="paymentModal">
-        <div class="payment-box">
-            <button class="close-modal" onclick="closePaymentModal()"><i class="fas fa-times"></i></button>
-            <h2 style="color: var(--brand-blue);">Secure Payment</h2>
-            <p style="color: #666; margin-top: 5px;">Amount to Pay: <strong style="color: var(--brand-red); font-size: 20px;" id="payAmountTxt">₹0</strong></p>
-            
-            <!-- Desktop QR Code -->
-            <div class="qr-placeholder" id="qrContainer">
-                <img id="qrCodeImg" src="" alt="UPI QR Code" style="width: 100%; border-radius: 8px;">
+    <!-- ==========================================
+         VIEW 3: ADMIN DASHBOARD
+         ========================================== -->
+    <main id="admin-view" class="view-section">
+        <div class="dashboard-container">
+            <div class="dash-sidebar">
+                <h3>Master Admin</h3>
+                <ul>
+                    <li><i class="fas fa-plus"></i> Add Bus Route</li>
+                    <li><i class="fas fa-umbrella-beach"></i> Add Package</li>
+                    <li><i class="fas fa-check-circle"></i> Verify UTR Payments</li>
+                    <li><i class="fas fa-users"></i> Manage Owners</li>
+                </ul>
             </div>
-            <p style="font-size: 12px; color: #888;" class="desktop-only">Scan with GPay, PhonePe, or Paytm</p>
+            <div class="dash-content">
+                <h2 style="font-weight: 900; margin-bottom: 10px;">Dashboard Overview</h2>
+                <p style="color: #666; font-weight: 700;">Welcome. Use the sidebar to manage database entries.</p>
+                <!-- Form embeds go here based on previous admin setup -->
+                <div style="margin-top: 30px; padding: 20px; border: 1px solid #f39c12; border-radius: 8px; background: #fffdf5;">
+                    <h3 style="color: #f39c12;"><i class="fas fa-bell"></i> Pending Approvals</h3>
+                    <p style="margin-top: 10px; font-weight: 700;">Booking Ref: 321456789012 (₹1200) - <button style="background: var(--mmt-green); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Approve Ticket</button></p>
+                </div>
+            </div>
+        </div>
+    </main>
 
-            <!-- Mobile Magic Link -->
-            <a href="#" id="mobilePayBtn" class="mobile-pay-btn"><i class="fas fa-mobile-alt"></i> Tap to Pay via UPI App</a>
+    <!-- ==========================================
+         VIEW 4: BUS OWNER DASHBOARD
+         ========================================== -->
+    <main id="owner-view" class="view-section">
+        <div class="dashboard-container">
+            <div class="dash-sidebar" style="background: #2c3e50;">
+                <h3>Owner Panel</h3>
+                <p style="font-size: 14px; color: #aaa; margin-bottom: 20px;">Operator: Shyamoli Travels</p>
+                <ul>
+                    <li><i class="fas fa-chair"></i> Live Seat Manager</li>
+                    <li><i class="fas fa-chart-line"></i> Revenue Stats</li>
+                </ul>
+            </div>
+            <div class="dash-content">
+                <h2 style="font-weight: 900; margin-bottom: 10px;">Live Seat Management</h2>
+                <p style="color: #666; font-weight: 700; margin-bottom: 20px;">Click on a seat to instantly block it (Offline Booking).</p>
+                
+                <div class="bus-layout" style="max-width: 300px; padding: 30px;">
+                    <!-- Owner can click to toggle 'booked' status -->
+                    <div class="seat available" onclick="this.classList.toggle('booked'); this.classList.toggle('available');">1A</div>
+                    <div class="seat available" onclick="this.classList.toggle('booked'); this.classList.toggle('available');">1B</div>
+                    <div class="aisle"></div>
+                    <div class="seat booked" onclick="this.classList.toggle('booked'); this.classList.toggle('available');">1C</div>
+                    <div class="seat available" onclick="this.classList.toggle('booked'); this.classList.toggle('available');">1D</div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-            <!-- UTR Verification -->
-            <div class="utr-input-group">
-                <label>Step 2: Enter 12-digit UTR / Reference No.</label>
-                <input type="text" id="utrNumber" class="utr-input" placeholder="e.g. 321456789012" maxlength="12">
-                <button class="btn-verify" onclick="submitUTR()"><i class="fas fa-check-circle"></i> Confirm Booking</button>
+    <!-- ==========================================
+         MODALS (SEAT & PAYMENT)
+         ========================================== -->
+    
+    <!-- Seat Modal -->
+    <div class="modal-overlay" id="seatModal">
+        <div class="modal-box">
+            <button class="close-modal" onclick="closeModal('seatModal')"><i class="fas fa-times"></i></button>
+            <h2 style="font-weight: 900; color: var(--mmt-blue);">Select Seats</h2>
+            <div style="text-align: right; margin-bottom: 10px; color: #999;"><i class="fas fa-steering-wheel"></i></div>
+            
+            <div class="bus-layout" id="seatGrid"></div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <p style="font-weight: 700;">Selected: <span id="selCount" style="color: var(--mmt-red); font-size: 20px; font-weight: 900;">0</span></p>
+                <button class="btn-book" onclick="proceedToPay()">Proceed to Pay ₹<span id="selTotal">0</span></button>
             </div>
         </div>
     </div>
 
-    <!-- 3. PROVISIONAL TICKET VIEW -->
-    <main id="ticket-view" class="view-section">
-        <div class="ticket-box">
-            <i class="fas fa-clock" style="font-size: 40px; color: #f39c12;"></i>
-            <h2 class="ticket-status">Booking Received</h2>
-            <p style="font-size: 18px; color: #555;">Payment Under Verification</p>
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-box" style="text-align: center;">
+            <button class="close-modal" onclick="closeModal('paymentModal')"><i class="fas fa-times"></i></button>
+            <h2 style="font-weight: 900; color: var(--mmt-blue);">Secure Payment</h2>
+            <p style="color: #666; margin-top: 5px; font-weight: 700;">Total Amount: <strong style="color: var(--mmt-red); font-size: 24px;" id="payAmountTxt">₹0</strong></p>
             
-            <div class="ticket-loader"></div>
-            <p style="color: #888; font-size: 14px;">Usually takes 10-15 minutes to verify payment.</p>
-
-            <div class="ticket-details">
-                <p><strong>Journey:</strong> <span id="ticketJourney"></span></p>
-                <p><strong>Amount Paid:</strong> ₹<span id="ticketAmount"></span></p>
-                <p><strong>UTR Reference:</strong> <span id="ticketUTR"></span></p>
-                <p><strong>Status:</strong> <span style="color: #f39c12; font-weight: bold;">Pending Approval</span></p>
+            <div class="qr-placeholder">
+                <img id="qrCodeImg" src="" alt="UPI QR" style="width: 100%; height: 100%; border-radius: 6px;">
             </div>
+            <p class="desktop-only" style="font-size: 12px; font-weight: 700; color: #888; margin-bottom: 10px;">Scan with GPay, PhonePe, Paytm</p>
 
-            <button onclick="contactSupport()" style="background: #25D366; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">
-                <i class="fab fa-whatsapp"></i> Chat with Support
-            </button>
+            <a href="#" id="mobilePayBtn" class="mobile-pay-btn"><i class="fas fa-mobile-alt"></i> Tap to Pay via UPI App</a>
+
+            <div style="text-align: left; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+                <label style="font-weight: 900; color: #333; font-size: 14px;">Step 2: Enter 12-digit UTR No.</label>
+                <input type="text" id="utrInput" class="utr-input" placeholder="E.g. 321456789012" maxlength="12">
+                <button class="btn-verify" onclick="submitBooking()"><i class="fas fa-check-circle"></i> Confirm Booking</button>
+            </div>
         </div>
-    </main>
+    </div>
 
-    <script>
-        // CORE BUSINESS SETTINGS
-        const UPI_ID = "7679975939-1@okbizaxis";
-        const BUSINESS_NAME = "Safar Bengal";
-        const WHATSAPP_NUM = "919679481018";
+    <!-- Floating WhatsApp -->
+    <a href="https://wa.me/919679481018" target="_blank" class="whatsapp-float"><i class="fab fa-whatsapp"></i></a>
+
+    <!-- ==========================================
+         JAVASCRIPT LOGIC
+         ========================================== -->
+    <script type="module">
+        // Set Default Date
+        document.getElementById('travelDate').valueAsDate = new Date();
+
+        // 1. Triple Dot Menu Logic
+        window.toggleMenu = function() { document.getElementById("tripleMenu").classList.toggle("show"); }
+        window.onclick = function(e) {
+            if (!e.target.matches('.dropbtn') && !e.target.matches('.fa-ellipsis-v')) {
+                let dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].classList.remove('show');
+                }
+            }
+        }
+
+        // 2. Auth & Access Logic (Mocked for UI flow)
+        window.googleLogin = function() { alert("Google Auth Popup will appear here. \n(Requires Firebase SDK Config)"); }
         
-        let currentBookingAmount = 0;
-        let currentBookingDetails = "";
+        window.promptAccess = function(role) {
+            let pwd = prompt(`Enter ${role.toUpperCase()} Password:`);
+            if(role === 'admin' && pwd === 'admin123') switchView('admin-view');
+            else if (role === 'owner' && pwd === 'owner123') switchView('owner-view');
+            else alert("Incorrect Password! Access Denied.");
+        }
 
-        // OPEN PAYMENT MODAL
-        function openPaymentModal(amount, details) {
-            currentBookingAmount = amount;
-            currentBookingDetails = details;
+        // 3. SPA View & Tab Switcher
+        window.switchView = function(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        window.switchTab = function(formId, element) {
+            document.querySelectorAll('.search-form').forEach(f => f.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(formId).classList.add('active');
+            element.classList.add('active');
+        }
+
+        // 4. MMT Style Mock Search
+        window.loadMockBuses = function() {
+            const results = document.getElementById('resultsArea');
+            results.innerHTML = `
+                <h2 style="margin-bottom: 20px; font-weight: 900;">Available Buses</h2>
+                <div class="bus-card">
+                    <div class="bus-info">
+                        <h3>Shyamoli Paribahan Volvo A/C</h3>
+                        <p>Siliguri ➔ Kolkata | 06:00 PM</p>
+                        <p style="color: #f39c12; margin-top: 5px;"><i class="fas fa-star"></i> 4.5 (80 Reviews)</p>
+                    </div>
+                    <div class="price-col">
+                        <h2>₹1200</h2>
+                        <button class="btn-view-seats" onclick="openSeatModal('Shyamoli', 1200)">VIEW SEATS</button>
+                    </div>
+                </div>
+                <div class="bus-card">
+                    <div class="bus-info">
+                        <h3>Greenline Premium Non-A/C</h3>
+                        <p>Siliguri ➔ Kolkata | 08:30 PM</p>
+                        <p style="color: #f39c12; margin-top: 5px;"><i class="fas fa-star"></i> 4.1 (45 Reviews)</p>
+                    </div>
+                    <div class="price-col">
+                        <h2>₹800</h2>
+                        <button class="btn-view-seats" onclick="openSeatModal('Greenline', 800)">VIEW SEATS</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 5. Seat Selection Logic
+        let activePrice = 0;
+        let activeBus = "";
+        let selectedSeats = [];
+
+        window.openSeatModal = function(operator, price) {
+            activePrice = price;
+            activeBus = operator;
+            selectedSeats = [];
+            updateSeatSummary();
             
-            document.getElementById('payAmountTxt').innerText = `₹${amount}`;
+            const grid = document.getElementById('seatGrid');
+            grid.innerHTML = '';
             
-            // Generate Dynamic UPI Link
-            const upiLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(BUSINESS_NAME)}&am=${amount}&cu=INR&tn=Ticket Booking`;
+            for(let i=1; i<=8; i++) {
+                grid.innerHTML += `<div class="seat available" onclick="toggleSeat(this, '${i}A')">${i}A</div>`;
+                grid.innerHTML += `<div class="seat available" onclick="toggleSeat(this, '${i}B')">${i}B</div>`;
+                grid.innerHTML += `<div class="aisle"></div>`;
+                let isBooked = Math.random() > 0.7 ? 'booked' : 'available';
+                grid.innerHTML += `<div class="seat ${isBooked}" onclick="toggleSeat(this, '${i}C')">${i}C</div>`;
+                grid.innerHTML += `<div class="seat available" onclick="toggleSeat(this, '${i}D')">${i}D</div>`;
+            }
+            document.getElementById('seatModal').style.display = 'flex';
+        }
+
+        window.toggleSeat = function(el, seatNum) {
+            if(el.classList.contains('booked')) return;
             
-            // Generate QR Code for Desktop using free API
-            document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+            if(el.classList.contains('selected')) {
+                el.classList.remove('selected');
+                selectedSeats = selectedSeats.filter(s => s !== seatNum);
+            } else {
+                if(selectedSeats.length >= 6) { alert("Max 6 seats allowed."); return; }
+                el.classList.add('selected');
+                selectedSeats.push(seatNum);
+            }
+            updateSeatSummary();
+        }
+
+        function updateSeatSummary() {
+            document.getElementById('selCount').innerText = selectedSeats.length;
+            document.getElementById('selTotal').innerText = selectedSeats.length * activePrice;
+        }
+
+        window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
+
+        // 6. Direct UPI Payment Logic (Zero Commission)
+        const UPI_ID = "7679975939-1@okbizaxis";
+        const PHONE = "919679481018";
+
+        window.proceedToPay = function() {
+            if(selectedSeats.length === 0) { alert("Select at least 1 seat."); return; }
             
-            // Set Link for Mobile Button
-            document.getElementById('mobilePayBtn').href = upiLink;
+            const total = selectedSeats.length * activePrice;
+            document.getElementById('payAmountTxt').innerText = `₹${total}`;
             
+            const upiUrl = `upi://pay?pa=${UPI_ID}&pn=Safar Bengal&am=${total}&cu=INR&tn=Bus Booking`;
+            document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
+            document.getElementById('mobilePayBtn').href = upiUrl;
+            
+            closeModal('seatModal');
             document.getElementById('paymentModal').style.display = 'flex';
         }
 
-        function closePaymentModal() {
-            document.getElementById('paymentModal').style.display = 'none';
-        }
-
-        // SUBMIT UTR AND GENERATE TICKET
-        function submitUTR() {
-            const utr = document.getElementById('utrNumber').value.trim();
-            if(utr.length < 12) {
-                alert("Please enter a valid 12-digit UTR/Reference Number.");
-                return;
-            }
-
-            // Close Modal & Switch to Ticket View
-            closePaymentModal();
-            document.getElementById('customer-view').classList.remove('active');
-            document.getElementById('ticket-view').classList.add('active');
-
-            // Populate Ticket Data
-            document.getElementById('ticketJourney').innerText = currentBookingDetails;
-            document.getElementById('ticketAmount').innerText = currentBookingAmount;
-            document.getElementById('ticketUTR').innerText = utr;
-
-            // Trigger WhatsApp Alert to Admin
-            sendWhatsAppAlert(utr);
-        }
-
-        function sendWhatsAppAlert(utr) {
-            const message = `*NEW BOOKING ALERT* 🚨\n\n*Journey:* ${currentBookingDetails}\n*Amount:* ₹${currentBookingAmount}\n*UTR Ref:* ${utr}\n\nPlease verify payment and confirm my ticket.`;
-            const waLink = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(message)}`;
+        // 7. UTR Verification & Ticket Generation
+        window.submitBooking = function() {
+            const utr = document.getElementById('utrInput').value;
+            if(utr.length < 12) { alert("Enter a valid 12-digit UTR number."); return; }
             
-            // Open WhatsApp in a new tab silently
-            window.open(waLink, '_blank');
+            const total = selectedSeats.length * activePrice;
+            
+            document.getElementById('tktJourney').innerText = `${activeBus} (Siliguri to Kolkata)`;
+            document.getElementById('tktSeats').innerText = selectedSeats.join(", ");
+            document.getElementById('tktAmount').innerText = total;
+            document.getElementById('tktUTR').innerText = utr;
+            
+            closeModal('paymentModal');
+            switchView('ticket-view');
+            
+            // Auto WhatsApp to Admin
+            const msg = `*NEW BOOKING* \nBus: ${activeBus}\nSeats: ${selectedSeats.join(",")}\nAmt: ₹${total}\nUTR: ${utr}\nPlease approve.`;
+            window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        function contactSupport() {
-            const utr = document.getElementById('ticketUTR').innerText;
-            const message = `Hi, I am checking the status of my booking. My UTR is ${utr}.`;
-            window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(message)}`, '_blank');
+        window.contactWhatsAppSupport = function() {
+            const utr = document.getElementById('tktUTR').innerText;
+            window.open(`https://wa.me/${PHONE}?text=Hi, verifying ticket for UTR: ${utr}`, '_blank');
         }
     </script>
 </body>
